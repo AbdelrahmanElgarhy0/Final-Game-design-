@@ -4,6 +4,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Forward Movement")]
     public float forwardSpeed = 6f;
+    public Transform obstaclesContainer;
+
 
     [Header("Jump")]
     public float jumpForce = 7f;
@@ -65,25 +67,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
- void FixedUpdate()
+   void FixedUpdate()
 {
-    // Calculate forward movement
+    // Forward movement
     float newZ = rb.position.z - forwardSpeed * Time.fixedDeltaTime;
-
-    // 🚫 Prevent going past -80
-    if (newZ <= resetZ)
-    {
-        // RESET immediately
-        rb.position = new Vector3(
-            startX,
-            rb.position.y,
-            startZ
-        );
-
-        currentLane = 1;
-        isGrounded = true;
-        return;
-    }
 
     // Lane movement
     float targetX = startX + (currentLane - 1) * laneDistance;
@@ -93,7 +80,22 @@ public class PlayerMovement : MonoBehaviour
         laneSwitchSpeed * Time.fixedDeltaTime
     );
 
-    rb.MovePosition(new Vector3(newX, rb.position.y, newZ));
+    Vector3 nextPos = new Vector3(newX, rb.position.y, newZ);
+
+    // 🔁 RESET EXACTLY AT Z = -80
+   // 🔁 RESET EXACTLY AT Z = -80
+if (rb.position.z <= resetZ)
+{
+    ClearObstacles();   // 👈 ADD THIS LINE
+
+    nextPos.z = startZ;
+    nextPos.x = startX;
+    currentLane = 1;
+    isGrounded = true;
+}
+
+
+    rb.MovePosition(nextPos);
 }
 
 
@@ -104,4 +106,17 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = true;
         }
     }
+    void ClearObstacles()
+    
+{
+    Debug.Log("ClearObstacles CALLED");
+    if (obstaclesContainer == null)
+        return;
+
+    for (int i = obstaclesContainer.childCount - 1; i >= 0; i--)
+    {
+        Destroy(obstaclesContainer.GetChild(i).gameObject);
+    }
+}
+
 }
