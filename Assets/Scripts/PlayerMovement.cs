@@ -1,7 +1,11 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Game Over UI")]
+public GameObject gameOverCanvas;
+public TMPro.TextMeshProUGUI finalScoreText;
+
     [Header("Forward Movement")]
     public float forwardSpeed = 6f;
 
@@ -121,8 +125,16 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
 
             anim.SetTrigger("Fall");
+            Invoke(nameof(TriggerGameOver), 1f); // wait for fall animation
         }
     }
+    public void RestartGame()
+{
+    Time.timeScale = 1f;   // 🔴 THIS IS THE FIX
+    ScoreManager.instance.ResetScore();
+    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+}
+
 
     void ClearObstacles()
     {
@@ -134,4 +146,13 @@ public class PlayerMovement : MonoBehaviour
             Destroy(obstaclesContainer.GetChild(i).gameObject);
         }
     }
+    void TriggerGameOver()
+{
+    Time.timeScale = 0f; // stop game
+    gameOverCanvas.SetActive(true);
+
+    finalScoreText.text =
+        "Score: " + ScoreManager.instance.GetFinalScore();
+}
+
 }
