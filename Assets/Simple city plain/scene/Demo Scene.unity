@@ -8284,11 +8284,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   forwardSpeed: 6
-  obstaclesContainer: {fileID: 1130701909}
   jumpForce: 7
   laneDistance: 3
   laneSwitchSpeed: 10
   resetZ: -93
+  obstaclesContainer: {fileID: 1130701909}
 --- !u!4 &630374899 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 758afd52f0e82dc45abd77d1aee102c4, type: 3}

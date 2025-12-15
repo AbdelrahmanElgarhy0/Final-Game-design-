@@ -122,6 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4884130492571914}
   - component: {fileID: 3578714544197878559}
+  - component: {fileID: -5940096541628932651}
   m_Layer: 0
   m_Name: Big_trash_bin prefab
   m_TagString: 'Collectible '
@@ -164,8 +165,20 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.723328, y: 1, z: 2.158939}
+  m_Center: {x: 0.3785706, y: 1, z: 0.1325855}
+--- !u!114 &-5940096541628932651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1520711273483040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484847c3044cf4a41820986c0d9b7c10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
 --- !u!1 &1631846186159236
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,8 +4,6 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Forward Movement")]
     public float forwardSpeed = 6f;
-    public Transform obstaclesContainer;
-
 
     [Header("Jump")]
     public float jumpForce = 7f;
@@ -15,16 +13,20 @@ public class PlayerMovement : MonoBehaviour
     public float laneSwitchSpeed = 10f;
 
     [Header("Endless Settings")]
-    public float resetZ = -80f;   // 👈 RESET POINT
+    public float resetZ = -80f;
+
+    [Header("References")]
+    public Transform obstaclesContainer;
 
     Animator anim;
     Rigidbody rb;
 
-    bool isGrounded = true;
+    bool isGrounded = false;
+    bool isDead = false;
 
     int currentLane = 1; // 0 = left, 1 = middle, 2 = right
     float startX;
-    float startZ; // respawn Z
+    float startZ;
 
     void Start()
     {
@@ -34,18 +36,20 @@ public class PlayerMovement : MonoBehaviour
         startX = transform.position.x;
         startZ = transform.position.z;
 
-        currentLane = 1;
         anim.SetBool("isRunning", true);
     }
 
     void Update()
     {
-        // ===== JUMP =====
+        if (isDead)
+            return;
+
+        // JUMP
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             isGrounded = false;
 
-            Vector3 v = rb.linearVelocity;   // ✅ FIXED
+            Vector3 v = rb.linearVelocity;
             v.y = 0f;
             rb.linearVelocity = v;
 
@@ -53,13 +57,14 @@ public class PlayerMovement : MonoBehaviour
             anim.SetTrigger("Jump");
         }
 
-        // ===== LANE INPUT =====
+        // LANE LEFT
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (currentLane > 0)
                 currentLane--;
         }
 
+        // LANE RIGHT
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             if (currentLane < 2)
@@ -67,56 +72,66 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-   void FixedUpdate()
-{
-    // Forward movement
-    float newZ = rb.position.z - forwardSpeed * Time.fixedDeltaTime;
+    void FixedUpdate()
+    {
+        if (isDead)
+            return;
 
-    // Lane movement
-    float targetX = startX + (currentLane - 1) * laneDistance;
-    float newX = Mathf.Lerp(
-        rb.position.x,
-        targetX,
-        laneSwitchSpeed * Time.fixedDeltaTime
-    );
+        float newZ = rb.position.z - forwardSpeed * Time.fixedDeltaTime;
 
-    Vector3 nextPos = new Vector3(newX, rb.position.y, newZ);
+        // ENDLESS RESET
+        if (rb.position.z <= resetZ)
+        {
+            ClearObstacles();
 
-    // 🔁 RESET EXACTLY AT Z = -80
-   // 🔁 RESET EXACTLY AT Z = -80
-if (rb.position.z <= resetZ)
-{
-    ClearObstacles();   // 👈 ADD THIS LINE
+            rb.position = new Vector3(startX, rb.position.y, startZ);
+            currentLane = 1;
+            isGrounded = true;
+            return;
+        }
 
-    nextPos.z = startZ;
-    nextPos.x = startX;
-    currentLane = 1;
-    isGrounded = true;
-}
+        float targetX = startX + (currentLane - 1) * laneDistance;
+        float newX = Mathf.Lerp(rb.position.x, targetX, laneSwitchSpeed * Time.fixedDeltaTime);
 
+        rb.MovePosition(new Vector3(newX, rb.position.y, newZ));
+    }
 
-    rb.MovePosition(nextPos);
-}
-
-
-    void OnCollisionEnter(Collision collision)
+    // ✅ STABLE GROUND CHECK
+    void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.name == "street")
         {
             isGrounded = true;
         }
     }
-    void ClearObstacles()
-    
-{
-    Debug.Log("ClearObstacles CALLED");
-    if (obstaclesContainer == null)
-        return;
 
-    for (int i = obstaclesContainer.childCount - 1; i >= 0; i--)
+    // ✅ OBSTACLE TRIGGER
+    void OnTriggerEnter(Collider other)
     {
-        Destroy(obstaclesContainer.GetChild(i).gameObject);
-    }
-}
+        if (isDead)
+            return;
 
+        Obstacle obstacle = other.GetComponent<Obstacle>();
+
+        if (obstacle != null)
+        {
+            Debug.Log("HIT OBSTACLE");
+
+            isDead = true;
+            rb.linearVelocity = Vector3.zero;
+
+            anim.SetTrigger("Fall");
+        }
+    }
+
+    void ClearObstacles()
+    {
+        if (obstaclesContainer == null)
+            return;
+
+        for (int i = obstaclesContainer.childCount - 1; i >= 0; i--)
+        {
+            Destroy(obstaclesContainer.GetChild(i).gameObject);
+        }
+    }
 }
