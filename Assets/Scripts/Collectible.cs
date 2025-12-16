@@ -2,14 +2,18 @@ using UnityEngine;
 
 public class Collectible : MonoBehaviour
 {
-    public int scoreValue = 10;
+    public CollectibleData data;
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player"))
+            return;
+
+        if (ScoreManager.instance != null && data != null)
         {
-            ScoreManager.instance.AddScore(scoreValue);
-            Destroy(gameObject);
+            ScoreManager.instance.AddScore(data.scoreValue);
         }
+
+        Destroy(gameObject);
     }
 }
