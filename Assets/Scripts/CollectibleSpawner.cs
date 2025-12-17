@@ -35,7 +35,7 @@ public class CollectibleSpawner : MonoBehaviour
 
     void SpawnCollectible()
     {
-        // Choose random lane: 0 = left, 1 = middle, 2 = right
+        // Choose random lane
         int laneIndex = Random.Range(0, 3);
         float laneX = startX + (laneIndex - 1) * laneDistance;
 

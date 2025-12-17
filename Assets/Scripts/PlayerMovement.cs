@@ -41,6 +41,8 @@ public TMPro.TextMeshProUGUI finalScoreText;
         startZ = transform.position.z;
 
         anim.SetBool("isRunning", true);
+         if (AudioManager.instance != null)
+        AudioManager.instance.PlayMusicIfNotPlaying();
     }
 
     void Update()
@@ -123,6 +125,10 @@ public TMPro.TextMeshProUGUI finalScoreText;
 
             isDead = true;
             rb.linearVelocity = Vector3.zero;
+           AudioManager.instance.StopMusic();   // ⛔ stop background music
+AudioManager.instance.PlayHit();     // 🔊 play hit sound
+anim.SetTrigger("Fall");
+
 
             anim.SetTrigger("Fall");
             Invoke(nameof(TriggerGameOver), 1f); // wait for fall animation
@@ -130,7 +136,7 @@ public TMPro.TextMeshProUGUI finalScoreText;
     }
     public void RestartGame()
 {
-    Time.timeScale = 1f;   // 🔴 THIS IS THE FIX
+    Time.timeScale = 1f;   
     ScoreManager.instance.ResetScore();
     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 }

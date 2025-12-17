@@ -13,6 +13,7 @@ public class Collectible : MonoBehaviour
         {
             ScoreManager.instance.AddScore(data.scoreValue);
         }
+        AudioManager.instance.PlayCollect();
 
         Destroy(gameObject);
     }
