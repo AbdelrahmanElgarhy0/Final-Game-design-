@@ -41,8 +41,7 @@ public TMPro.TextMeshProUGUI finalScoreText;
         startZ = transform.position.z;
 
         anim.SetBool("isRunning", true);
-         if (AudioManager.instance != null)
-        AudioManager.instance.PlayMusicIfNotPlaying();
+        
     }
 
     void Update()
@@ -152,10 +151,18 @@ anim.SetTrigger("Fall");
             Destroy(obstaclesContainer.GetChild(i).gameObject);
         }
     }
-    void TriggerGameOver()
+    bool gameOver = false;
+
+void TriggerGameOver()
 {
+    if (gameOver) return;   // ⛔ STOP double execution
+    gameOver = true;
+
     Time.timeScale = 0f; // stop game
     gameOverCanvas.SetActive(true);
+
+    ScoreManager.instance.SaveHighScore();
+    ScoreManager.instance.SaveTopScores();
 
     finalScoreText.text =
         "Score: " + ScoreManager.instance.GetFinalScore();
